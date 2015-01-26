@@ -1,0 +1,12 @@
+[cases]
+
+testcategory_1.testgroup_1.testclass_1.testmethod_1 = 1
+testcategory_1.testgroup_1.testclass_1.testmethod_2 = 1
+testcategory_1.testgroup_1.testclass_1.testmethod_3 = 1
+testcategory_1.testgroup_1.testclass_2.testmethod_1 = 1
+testcategory_1.testgroup_1.testclass_2.testmethod_2 = 3
+testcategory_1.testgroup_1.testclass_2.testmethod_3 = 0
+testcategory_1.testgroup_2.testclass_3.testsubclass_1.testmethod_1 = 1
+testcategory_1.testgroup_2.testclass_3.testsubclass_2.testmethod_1 = 1
+testcategory_2.testgroup_1.testclass_1.testmethod_1 = 1
+testcategory_2.testgroup_1.testclass_1.testmethod_2 = 1
