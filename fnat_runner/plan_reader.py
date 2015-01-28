@@ -21,10 +21,13 @@ class plan_reader:
     def __init__(self, plan_url):
         self.plan = plan_url
         self.case_list = []
+        testset_root = os.environ['FNAT_TESTSET_ROOT']
+        os.chdir(testset_root)
 
     def read_cases(self):
+        plan_location = "testplan/" + self.plan
         config = ConfigParser.ConfigParser()
-        config.read(self.plan)
+        config.read(plan_location)
         all_cases = config.items("cases")
         for case_entry in all_cases:
             if (string.atoi(case_entry[1]) > 0) and (len(case_entry[0].split(".")) > 3):
@@ -35,12 +38,9 @@ class plan_reader:
                 self.case_list.append(case_entry)
 
     def run_case(self):
-        case_location = os.environ['FNAT_TESTSET_ROOT'] + "/testcase"
-        os.chdir(case_location)
-
         for case_entry in self.case_list:
             entry_items = case_entry[0].split(".")
-            case_cmdline = ""
+            case_cmdline = "testcase/"
 
             for i in range(0, len(entry_items) - 3):
                 case_cmdline += entry_items[i] + "/"

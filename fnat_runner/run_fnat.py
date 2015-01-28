@@ -63,7 +63,6 @@ if __name__ == "__main__":
 
         print "[FNAT] root = ", root_testset, "plan = ", plan_testset
         os.environ['FNAT_TESTSET_ROOT'] = root_testset
-        plan_testset = root_testset + "/testplan/" + plan_testset
         p_reader = plan_reader.plan_reader(plan_testset)
         p_reader.read_cases()
         p_reader.run_case()
