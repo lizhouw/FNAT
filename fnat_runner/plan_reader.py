@@ -38,6 +38,9 @@ class plan_reader:
                 self.case_list.append(case_entry)
 
     def run_case(self):
+        lib_path = os.getcwd() + "/testlib/"
+        sys.path.append(lib_path)
+
         for case_entry in self.case_list:
             entry_items = case_entry[0].split(".")
             case_cmdline = "testcase/"

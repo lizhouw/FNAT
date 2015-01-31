@@ -1,4 +1,5 @@
-from uiautomator import Device
+#from uiautomator import Device
+import fnat_dev
 import time
 
 class testclass_1:
@@ -10,7 +11,7 @@ class testclass_1:
 
     def testmethod_1(self):
         print "Method testmethod_1 in class testclass_1"
-        d = Device("0c05b1d4dbc84ce8")
+        d = FnatDevice.FnatDevice("0c05b1d4dbc84ce8")
         d.press.home()
         time.sleep(0.5)
         d.screenshot("home.png")
