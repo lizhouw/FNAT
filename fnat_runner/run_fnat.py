@@ -5,12 +5,6 @@
 #  Project:   fnat (Fluke Networks Automation Tester)
 #
 #  This script is the main entry of project fnat.
-#  The syntax is:
-#  $ run_fnat.py
-#    -r, --root: identify root of test set url
-#    -p, --plan: identify url of test plan
-#    -l, --log:  identify url of execution log
-#    -h, --help: print help information
 #
 
 import os
@@ -23,13 +17,14 @@ def Usage():
     print "run_fnat.py"
     print "  -r, --root: identify root of test set url"
     print "  -p, --plan: identify url of test plan"
+    print "  -s, --serial: identify the serial no of device which we want to test"
     print "  -l, --log:  identify url of execution log"
     print "  -h, --help: print help information"
 
 if __name__ == "__main__":
     try:
         os.unsetenv('FNAT_TESTSET_LOG')
-        opts, args = getopt.getopt(sys.argv[1:], 'hp:r:l:', ['help', 'plan=', 'root=', 'log='])
+        opts, args = getopt.getopt(sys.argv[1:], 'hp:r:s:l:', ['help', 'plan=', 'root=', 'serial=', 'log='])
     except getopt.GetoptError, err:
         print str(err)
         Usage()
@@ -43,6 +38,8 @@ if __name__ == "__main__":
             root_testset = a
         elif o in ('-p', '--plan'):
             plan_testset = a
+        elif o in ('-s', '--serial'):
+            os.environ['FNAT_SERIAL_NO'] = a
         elif o in ('-l', '--log'):
             os.environ['FNAT_TESTSET_LOG'] = a
         else:

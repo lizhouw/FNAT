@@ -12,6 +12,7 @@ import os
 import string
 import subprocess
 import sys
+import adb_obj
 
 
 class plan_reader:
@@ -38,8 +39,19 @@ class plan_reader:
                 self.case_list.append(case_entry)
 
     def run_case(self):
-        lib_path = os.getcwd() + "/testlib/"
-        sys.path.append(lib_path)
+        lib_path = os.getcwd() + "/testlib/:" + sys.path[0]
+        if os.environ.has_key('PYTHONPATH'):
+            os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ":" + lib_path 
+        else:
+            os.environ['PYTHONPATH'] = lib_path
+
+        adb_mgr = adb_obj.adb_obj()
+        adb_mgr.restart_adb_server()
+
+        if os.environ.has_key('FNAT_SERIAL_NO'):
+            adb_mgr.set_adb_serial(os.environ['FNAT_SERIAL_NO'])
+        else: 
+            adb_mgr.get_adb_serial()
 
         for case_entry in self.case_list:
             entry_items = case_entry[0].split(".")
@@ -51,7 +63,9 @@ class plan_reader:
             case_cmdline += entry_items[-2] + "."
             case_cmdline += entry_items[-1]
 
-
             for i in range(0, string.atoi(case_entry[1])):
-                p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=sys.stdout, stderr=sys.stderr)
-                p.wait()
+                try:
+                    p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=sys.stdout, stderr=sys.stderr, env=None)
+                    p.wait()
+                except Exception as e:
+                    print "Exception = ", e
