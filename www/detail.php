@@ -9,6 +9,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>FNAT Web Portal</title>
+    <script language="JavaScript">
+    <!--
+    function openwindow(screen_shot){
+        window.open("screen.php?screen=" + screen_shot, "Screen Shot", "height=600, width=800, toolbar=no, menubar=no, scrollbar=no, resizable=yes, location=no, status=no")
+    }
+    -->
+    </script>
     <style type="text/css" media="screen">
   * {
     margin: 0px 0px 0px 0px;
@@ -220,6 +227,8 @@
           $row = mysql_fetch_row($rs);
           mysql_free_result($rs);
 
+          $execution_path = "fnat_log/$row[4]";
+
           echo "<div class=\"table_of_contents\"></div>";
           echo "<div class=\"section_header\"><div id=\"serial\"></div>Device: $row[3] ($row[1]) $row[2]</div>";
           echo "<div class=\"table_of_contents\"></div>";
@@ -237,7 +246,8 @@
               else{
                   echo "<td style=\"width:250px\"><b><font color=\"#F00\">FAIL</font></b></td>";
               }
-              echo "<td>Screenshot</td>";
+              $screen_path = "$execution_path/$row[2]/Case_FinalScreen.png";
+              echo "<td><a onclick=\"openwindow('$screen_path')\">Screenshot</a></td>";
               echo "</tr>";
           }
           mysql_free_result($rs_query_execution);
