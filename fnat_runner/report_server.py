@@ -51,3 +51,5 @@ class report_server:
         except Exception as e:
             print "Exception = ", e
 
+    def insert_new_record(self, exec_id):
+        pass

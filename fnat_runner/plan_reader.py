@@ -99,6 +99,7 @@ class plan_reader:
                     try:
                         p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=sys.stdout, stderr=sys.stderr, env=None)
                         p.wait()
+                        data_server.insert_new_record(exec_id)
                     except Exception as e:
                         print "Exception = ", e
         finally:
