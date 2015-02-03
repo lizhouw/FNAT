@@ -207,6 +207,7 @@
            Test Result
         </div>
         <?php
+          $exec_id = $_GET['exec_id'];
           $mysql_conn = mysql_connect("localhost", "root", "123456");
           if(!$mysql_conn){
               echo "<div class=\"content_section_text\">";
@@ -214,35 +215,35 @@
               echo "</div>";
           }
           mysql_select_db("fnat_base", $mysql_conn);
-          $q = "SELECT DISTINCT(serial_no) FROM fnat_execution";
+          $q = "SELECT * FROM fnat_execution WHERE exec_id=$exec_id";
           $rs = mysql_query($q, $mysql_conn);
-          $list_all_serial = array();
-          while($row = mysql_fetch_row($rs)){
-              array_push($list_all_serial, $row[0]);
-          }
+          $row = mysql_fetch_row($rs);
           mysql_free_result($rs);
 
-          reset($list_all_serial);
-          while(list($key, $this_serial) = each($list_all_serial)){
-              echo "<div class=\"table_of_contents\"></div>";
-              echo "<div class=\"section_header\"><div id=\"serial\"></div>Device: $this_serial</div>";
-              echo "<div class=\"table_of_contents\"></div>";
-              echo "<div class=\"content_section_text\">";
-              echo "<table border=\"1px\" cellspacing=\"0px\" style=\"width:800px\">";
+          echo "<div class=\"table_of_contents\"></div>";
+          echo "<div class=\"section_header\"><div id=\"serial\"></div>Device: $row[3] ($row[1]) $row[2]</div>";
+          echo "<div class=\"table_of_contents\"></div>";
+          echo "<div class=\"content_section_text\">";
+          echo "<table border=\"1px\" cellspacing=\"0px\" style=\"width:800px\">";
 
-              $sql_query_execution = "SELECT * FROM fnat_execution WHERE serial_no = '$this_serial' ORDER BY start_time DESC";
-              $rs_query_execution = mysql_query($sql_query_execution, $mysql_conn);
-              while($row = mysql_fetch_row($rs_query_execution)){
-                  echo "<tr>";
-                  echo "<td style=\"width:500px\">$row[1]</td>";
-                  echo "<td style=\"width:250px\">$row[2]</td>";
-                  echo "<td><a href=\"detail.php?exec_id=$row[0]\">details</a></td>";
-                  echo "</tr>";
+          $sql_query_execution = "SELECT * FROM fnat_case_result WHERE exec_id = $exec_id ORDER BY record_id";
+          $rs_query_execution = mysql_query($sql_query_execution, $mysql_conn);
+          while($row = mysql_fetch_row($rs_query_execution)){
+              echo "<tr>";
+              echo "<td style=\"width:500px\">$row[2]</td>";
+              if(0 == $row[3]){
+                  echo "<td style=\"width:250px\"><b><font color=\'#0F0\">PASS</font></b></td>";
               }
-              mysql_free_result($rs_query_execution);
-              echo "</table>";
-              echo "</div>";
-          }  
+              else{
+                  echo "<td style=\"width:250px\"><b><font color=\"#F00\">FAIL</font></b></td>";
+              }
+              echo "<td>Screenshot</td>";
+              echo "</tr>";
+          }
+          mysql_free_result($rs_query_execution);
+          echo "</table>";
+          echo "</div>";
+
           mysql_close($mysql_conn);
         ?>
 
