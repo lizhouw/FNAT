@@ -35,7 +35,7 @@ if __name__ == "__main__":
             Usage()
             exit(0)
         elif o in ('-r', '--root'):
-            root_testset = a
+            os.environ['FNAT_TESTSET_ROOT'] = a
         elif o in ('-p', '--plan'):
             plan_testset = a
         elif o in ('-s', '--serial'):
@@ -46,25 +46,7 @@ if __name__ == "__main__":
             print 'unknown option'
             exit(2)
 
-    try:
-        log_case = None
-        sys_stdout = None
-        sys_stderr = None
-
-        if os.environ.has_key('FNAT_TESTSET_LOG'):
-            log_case = open(os.environ['FNAT_TESTSET_LOG'], 'w+')
-            sys_stdout = sys.stdout
-            sys_stderr = sys.stderr
-            sys.stdout = log_case
-            sys.stderr = log_case
-
-        print "[FNAT] root = ", root_testset, "plan = ", plan_testset
-        os.environ['FNAT_TESTSET_ROOT'] = root_testset
-        p_reader = plan_reader.plan_reader(plan_testset)
-        p_reader.read_cases()
-        p_reader.run_case()
-    finally:
-        if os.environ.has_key('FNAT_TESTSET_LOG'):
-            sys.stdout = sys_stdout
-            sys.stderr = sys_stderr
-            log_case.close()
+    print "[FNAT] root = ", os.environ['FNAT_TESTSET_ROOT'], "plan = ", plan_testset
+    p_reader = plan_reader.plan_reader(plan_testset)
+    p_reader.read_cases()
+    p_reader.run_case()

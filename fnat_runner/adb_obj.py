@@ -34,6 +34,6 @@ class adb_obj:
             assert False
 
     def run_adb_cmd(self, adb_cmd):
-        this_cmd = "adb shell -s " + self.serial + " " + adb_cmd
+        this_cmd = "adb -s " + self.serial + " shell  " + adb_cmd
         return os.popen(this_cmd).readlines()
 

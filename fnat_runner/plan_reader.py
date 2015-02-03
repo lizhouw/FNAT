@@ -13,6 +13,10 @@ import string
 import subprocess
 import sys
 import adb_obj
+import time
+import report_server
+import gl_var
+
 
 
 class plan_reader:
@@ -39,33 +43,70 @@ class plan_reader:
                 self.case_list.append(case_entry)
 
     def run_case(self):
-        lib_path = os.getcwd() + "/testlib/:" + sys.path[0]
-        if os.environ.has_key('PYTHONPATH'):
-            os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ":" + lib_path 
-        else:
-            os.environ['PYTHONPATH'] = lib_path
+        log_case = None
+        sys_stdout = None
+        sys_stderr = None
 
-        adb_mgr = adb_obj.adb_obj()
-        adb_mgr.restart_adb_server()
+        try:
+            lib_path = os.getcwd() + "/testlib/:" + sys.path[0]
+            if os.environ.has_key('PYTHONPATH'):
+                os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ":" + lib_path 
+            else:
+                os.environ['PYTHONPATH'] = lib_path
 
-        if os.environ.has_key('FNAT_SERIAL_NO'):
-            adb_mgr.set_adb_serial(os.environ['FNAT_SERIAL_NO'])
-        else: 
-            adb_mgr.get_adb_serial()
+            gl_var.adb_mgr = adb_obj.adb_obj()
+            gl_var.adb_mgr.restart_adb_server()
 
-        for case_entry in self.case_list:
-            entry_items = case_entry[0].split(".")
-            case_cmdline = "testcase/"
+            if os.environ.has_key('FNAT_SERIAL_NO'):
+                gl_var.adb_mgr.set_adb_serial(os.environ['FNAT_SERIAL_NO'])
+            else: 
+                gl_var.adb_mgr.get_adb_serial()
 
-            for i in range(0, len(entry_items) - 3):
-                case_cmdline += entry_items[i] + "/"
-            case_cmdline += entry_items[-3] + ".py:"
-            case_cmdline += entry_items[-2] + "."
-            case_cmdline += entry_items[-1]
+            log_folder = os.environ['FNAT_SERIAL_NO']
+            log_full_folder = os.environ['FNAT_TESTSET_LOG'] + "/" + log_folder
+            if os.path.exists(log_full_folder):
+                assert os.path.isdir(log_full_folder)
+            else:
+                os.makedirs(log_full_folder)
 
-            for i in range(0, string.atoi(case_entry[1])):
-                try:
-                    p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=sys.stdout, stderr=sys.stderr, env=None)
-                    p.wait()
-                except Exception as e:
-                    print "Exception = ", e
+            time.localtime(time.time())
+            log_folder += "/Exec-" + time.strftime("%Y-%m-%d-%H-%M-%S")
+            log_full_folder = os.environ['FNAT_TESTSET_LOG'] + "/" + log_folder
+            os.makedirs(log_full_folder)
+
+            os.environ['FNAT_LOG_FOLDER'] = log_folder
+
+            log_case = open(log_full_folder + "/fnat_case.log", "w+")
+            sys_stdout = sys.stdout
+            sys_stderr = sys.stderr
+            sys.stdout = log_case
+            sys.stderr = log_case
+
+            data_server = report_server.report_server()
+            exec_id = data_server.create_new_execution()
+
+            for case_entry in self.case_list:
+                entry_items = case_entry[0].split(".")
+                case_cmdline = "testcase/"
+
+                for i in range(0, len(entry_items) - 3):
+                    case_cmdline += entry_items[i] + "/"
+                case_cmdline += entry_items[-3] + ".py:"
+                case_cmdline += entry_items[-2] + "."
+                case_cmdline += entry_items[-1]
+
+                for i in range(0, string.atoi(case_entry[1])):
+                    try:
+                        p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=sys.stdout, stderr=sys.stderr, env=None)
+                        p.wait()
+                    except Exception as e:
+                        print "Exception = ", e
+        finally:
+            if None != sys_stdout:
+                sys.stdout = sys_stdout
+
+            if None != sys_stderr:
+                sys.stderr = sys_stderr
+
+            if None != log_case:
+                log_case.close()
