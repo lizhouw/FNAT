@@ -12,6 +12,6 @@ CREATE TABLE IF NOT EXISTS fnat_execution(
 CREATE TABLE IF NOT EXISTS fnat_case_result(
     record_id BIGINT   NOT NULL PRIMARY KEY AUTO_INCREMENT,
     exec_id   BIGINT   NOT NULL,
-    case_name CHAR(50) NOT NULL,
+    case_name CHAR(80) NOT NULL,
     verdict   CHAR     NOT NULL);
     

@@ -17,6 +17,14 @@ class adb_obj:
         self.kill_adb_server()
         self.start_adb_server()
 
+    def adb_push_file(self, src_path, dst_path):
+        this_cmd = "adb -s " + self.serial + " push " + src_path + " " + dst_path
+        return os.popen(this_cmd).readlines()
+
+    def adb_pull_file(self, src_path, dst_path):
+        this_cmd = "adb -s " + self.serial + " pull " + src_path + " " + dst_path
+        return os.popen(this_cmd).readlines()
+
     def set_adb_serial(self, serial_no):
         self.serial = serial_no
 

@@ -1,4 +1,3 @@
-#from uiautomator import Device
 from fnat_dev import FnatDevice
 import time
 import sys
@@ -23,7 +22,7 @@ class testclass_1:
 
     def testmethod_2(self):
         print "Method testmethod_2 in class testclass_1"
-        assert True
+        assert False
 
     def testmethod_3(self):
         print "Method testmethod_3 in class testclass_1"

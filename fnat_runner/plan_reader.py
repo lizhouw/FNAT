@@ -18,7 +18,6 @@ import report_server
 import gl_var
 
 
-
 class plan_reader:
     '''
     This class is to read/process FNAT plan
@@ -95,13 +94,25 @@ class plan_reader:
                 case_cmdline += entry_items[-2] + "."
                 case_cmdline += entry_items[-1]
 
-                for i in range(0, string.atoi(case_entry[1])):
+                exec_loop = string.atoi(case_entry[1])
+                for i in range(0, exec_loop):
                     try:
+                        if 1 == exec_loop:
+                            case_folder = log_full_folder + "/" + case_entry[0]
+                        else:
+                            case_folder = "%s/%s_%d" % (log_full_folder, case_entry[0], i)
+                        os.makedirs(case_folder)
+
                         p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=sys.stdout, stderr=sys.stderr, env=None)
-                        p.wait()
-                        data_server.insert_new_record(exec_id)
+                        r = p.wait()
+                        data_server.insert_new_record(exec_id, case_entry[0], r)
                     except Exception as e:
                         print "Exception = ", e
+                    finally:
+                        adb_cmd = "/system/bin/screencap /sdcard/Case_FinalScreen.png"
+                        gl_var.adb_mgr.run_adb_cmd(adb_cmd)
+
+                        gl_var.adb_mgr.adb_pull_file("/sdcard/Case_FinalScreen.png", case_folder + "/Case_FinalScreen.png")
         finally:
             if None != sys_stdout:
                 sys.stdout = sys_stdout

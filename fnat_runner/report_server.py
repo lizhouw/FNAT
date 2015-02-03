@@ -24,8 +24,8 @@ class report_server:
             print "Exception = ", e
 
     def create_new_execution(self):
+        cursor = self.conn.cursor()
         try:
-            cursor = self.conn.cursor()
             cursor.execute("BEGIN")
 
             list_build = gl_var.adb_mgr.run_adb_cmd("getprop ro.build.display.id")
@@ -33,12 +33,11 @@ class report_server:
                 assert False
             str_build = list_build[0].strip()
 
-            sql_cmd = "INSERT INTO fnat_execution(build_number, start_time, serial_no, log_location) VALUES(";
-            sql_cmd += "'" + str_build + "', ";
+            sql_cmd = "INSERT INTO fnat_execution(build_number, start_time, serial_no, log_location) VALUES("
+            sql_cmd += "'" + str_build + "', "
             sql_cmd += "now(), "
             sql_cmd += "'" + os.environ['FNAT_SERIAL_NO'] + "', "
             sql_cmd += "'" + os.environ['FNAT_LOG_FOLDER'] + "')"
-            print "sql_cmd = ", sql_cmd
             cursor.execute(sql_cmd)
 
             count = cursor.execute("SELECT @@IDENTITY")
@@ -49,7 +48,18 @@ class report_server:
 
             return exec_id
         except Exception as e:
+            cursor.execute("ROLLBACK")
             print "Exception = ", e
 
-    def insert_new_record(self, exec_id):
-        pass
+    def insert_new_record(self, exec_id, case_name, verdict):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("BEGIN")
+
+            sql_cmd = "INSERT INTO fnat_case_result(exec_id, case_name, verdict) VALUES(%d, '%s', %d)" % (exec_id, case_name, verdict)
+            cursor.execute(sql_cmd)
+
+            cursor.execute("COMMIT")
+        except Exception as e:
+            cursor.execute("ROLLBACK")
+            print "Exception = ", e

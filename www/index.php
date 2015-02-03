@@ -246,7 +246,7 @@
           mysql_close($mysql_conn);
         ?>
 
-        <div class="section_header">
+        <div class="section_header section_header_red">
           <div id="support"></div>
                 Support Information
         </div>
