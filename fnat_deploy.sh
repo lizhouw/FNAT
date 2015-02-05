@@ -35,6 +35,7 @@ git clone https://github.com/lizhouw/FNAT $1
 
 echo "Configure apache server..."
 cp $1/www/* /var/www/html/
+cp $1/flukenetworks-logo.png /usr/share/apache2/icons/
 rm -f /var/www/html/index.html
 service apache2 restart
 
