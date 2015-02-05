@@ -27,7 +27,7 @@ fi
 echo "Start to deploy FNAT system..."
 
 echo "Install system dependencies..."
-apt-get -y install apache2 php5 libapache2-mod-php5 mysql-server mysql-client php5-mysql git-core python-nose python-pip 
+apt-get -y install apache2 php5 libapache2-mod-php5 mysql-server mysql-client python-mysqldb php5-mysql git-core python-nose python-pip 
 pip install uiautomator
 
 echo "Download FNAT source code..."
@@ -37,6 +37,8 @@ echo "Configure apache server..."
 cp $1/www/* /var/www/html/
 cp $1/flukenetworks-logo.png /usr/share/apache2/icons/
 rm -f /var/www/html/index.html
+mkdir /var/www/html/fnat_log
+chmod 777 fnat_log
 service apache2 restart
 
 echo ""

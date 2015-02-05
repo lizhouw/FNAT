@@ -109,10 +109,8 @@ class plan_reader:
                     except Exception as e:
                         print "Exception = ", e
                     finally:
-                        adb_cmd = "/system/bin/screencap /sdcard/Case_FinalScreen.png"
+                        adb_cmd = "/system/bin/screencap -p | sed 's/\r$//' > " + case_folder + "/Case_FinalScreen.png"; 
                         gl_var.adb_mgr.run_adb_cmd(adb_cmd)
-
-                        gl_var.adb_mgr.adb_pull_file("/sdcard/Case_FinalScreen.png", case_folder + "/Case_FinalScreen.png")
         finally:
             if None != sys_stdout:
                 sys.stdout = sys_stdout
