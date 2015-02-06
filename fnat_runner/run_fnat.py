@@ -18,13 +18,14 @@ def Usage():
     print "  -r, --root: identify root of test set url"
     print "  -p, --plan: identify url of test plan"
     print "  -s, --serial: identify the serial no of device which we want to test"
+    print "  -w, --switch: identify the switch we are using, the possible value is in (cisco, hp, huawei)"
     print "  -l, --log:  identify url of execution log"
     print "  -h, --help: print help information"
 
 if __name__ == "__main__":
     try:
         os.unsetenv('FNAT_TESTSET_LOG')
-        opts, args = getopt.getopt(sys.argv[1:], 'hp:r:s:l:', ['help', 'plan=', 'root=', 'serial=', 'log='])
+        opts, args = getopt.getopt(sys.argv[1:], 'hp:r:s:w:l:', ['help', 'plan=', 'root=', 'serial=', 'switch=', 'log='])
     except getopt.GetoptError, err:
         print str(err)
         Usage()
@@ -40,6 +41,8 @@ if __name__ == "__main__":
             plan_testset = a
         elif o in ('-s', '--serial'):
             os.environ['FNAT_SERIAL_NO'] = a
+        elif o in ('-w', '--switch'):
+            os.environ['FNAT_SWITCH'] = a
         elif o in ('-l', '--log'):
             os.environ['FNAT_TESTSET_LOG'] = a
         else:
