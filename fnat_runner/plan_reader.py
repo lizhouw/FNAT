@@ -76,10 +76,6 @@ class plan_reader:
             os.environ['FNAT_LOG_FOLDER'] = log_folder
 
             log_case = open(log_full_folder + "/fnat_case.log", "w+")
-            sys_stdout = sys.stdout
-            sys_stderr = sys.stderr
-            sys.stdout = log_case
-            sys.stderr = log_case
 
             data_server = report_server.report_server()
             exec_id = data_server.create_new_execution()
@@ -103,20 +99,22 @@ class plan_reader:
                             case_folder = "%s/%s_%d" % (log_full_folder, case_entry[0], i)
                         os.makedirs(case_folder)
 
-                        p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=sys.stdout, stderr=sys.stderr, env=None)
+                        p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=None)
                         r = p.wait()
+
                         data_server.insert_new_record(exec_id, case_entry[0], r)
                     except Exception as e:
                         print "Exception = ", e
                     finally:
+                        log_buffer = p.stdout.readlines()
+                        for log_line in log_buffer:
+                            log_case.write(log_line)
+                        log_buffer = p.stderr.readlines()
+                        for log_line in log_buffer:
+                            log_case.write(log_line)
+                        log_case.flush()
                         adb_cmd = "/system/bin/screencap -p | sed 's/\r$//' > " + case_folder + "/Case_FinalScreen.png"; 
                         gl_var.adb_mgr.run_adb_cmd(adb_cmd)
         finally:
-            if None != sys_stdout:
-                sys.stdout = sys_stdout
-
-            if None != sys_stderr:
-                sys.stderr = sys_stderr
-
             if None != log_case:
                 log_case.close()

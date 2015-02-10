@@ -4,7 +4,7 @@ USE fnat_base;
 
 CREATE TABLE IF NOT EXISTS fnat_execution(
     exec_id      BIGINT    NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    build_number CHAR(50)  NOT NULL,
+    build_number CHAR(100) NOT NULL,
     start_time   DATETIME  NOT NULL,
     serial_no    CHAR(20)  NOT NULL,
     log_location CHAR(100) NOT NULL);
