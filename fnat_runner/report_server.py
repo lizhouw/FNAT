@@ -28,7 +28,10 @@ class report_server:
         try:
             cursor.execute("BEGIN")
 
-            list_build = gl_var.adb_mgr.run_adb_cmd("getprop ro.build.display.id")
+            if gl_var.adb_mgr.serial == 'fake':
+                list_build = [ 'FNAT fake build' ]
+            else:
+                list_build = gl_var.adb_mgr.run_adb_cmd("getprop ro.build.display.id")
             if 1 != len(list_build):
                 assert False
             str_build = list_build[0].strip()
