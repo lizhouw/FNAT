@@ -29,6 +29,7 @@ class plan_reader:
         os.chdir(testset_root)
 
     def read_cases(self):
+        # Read testplan and extract cases	
         plan_location = "testplan/" + self.plan
         config = ConfigParser.ConfigParser()
         config.read(plan_location)

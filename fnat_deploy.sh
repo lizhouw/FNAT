@@ -15,23 +15,12 @@ then
 	exit -2
 fi
 
-if [ $# != 1 ];
-then
-	echo "Bad syntax."
-	echo ""
-	echo "    fnat_deploy.sh fnat_sourcecode_folder."
-	echo ""
-	exit -3
-fi
-
 echo "Start to deploy FNAT system..."
 
 echo "Install system dependencies..."
 apt-get -y install apache2 php5 libapache2-mod-php5 mysql-server mysql-client python-mysqldb php5-mysql git-core python-nose python-pip 
 pip install uiautomator
-
-echo "Download FNAT source code..."
-git clone https://github.com/lizhouw/FNAT $1
+pip install nose-testconfig
 
 echo "Configure apache server..."
 cp $1/www/* /var/www/html/
