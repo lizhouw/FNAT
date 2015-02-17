@@ -3,7 +3,7 @@ import os
 
 class adb_obj:
     def __init__(self):
-        pass
+        self.serial = ''
 
     def start_adb_server(self):
         this_cmd = "adb start-server"

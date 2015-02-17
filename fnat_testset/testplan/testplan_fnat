@@ -1,4 +1,4 @@
 [cases]
 
-testcategory_1.testgroup_1.testclass_1.testmethod_1(data_file="a.txt") = 1
+testcategory_1.testgroup_1.testclass_1.testmethod_1 : (data_file="a.txt", loop=3)  = 1
 testcategory_1.testgroup_1.testclass_1.testmethod_2 = 1

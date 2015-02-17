@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 #
 #  File:      plan_reader.py
@@ -35,6 +35,15 @@ class plan_reader:
         config.read(plan_location)
         all_cases = config.items("cases")
         for case_entry in all_cases:
+            left_bracket_pos = case_entry[1].find('(')
+            right_bracket_pos = case_entry[1].find(')')
+            equal_mark_pos = case_entry[1].rfind('=')
+            if (left_bracket_pos >= 0) and (right_bracket_pos > left_bracket_pos + 1) and (equal_mark_pos > right_bracket_pos):
+                str_input_param = case_entry[0][left_bracket_pos + 1:right_bracket_pos - 1]
+                case_entry = (case_entry[0], case_entry[1][equal_mark_pos + 1:], case_entry[1][left_bracket_pos + 1:right_bracket_pos].strip())
+            else:
+                case_entry = (case_entry[0], case_entry[1][equal_mark_pos + 1:], "")
+                
             if (string.atoi(case_entry[1]) > 0) and (len(case_entry[0].split(".")) > 3):
                 # If case iteration is less than or equal to 0, it means that
                 # this case is disabled
@@ -42,18 +51,20 @@ class plan_reader:
                 # for, case file name, case class name and case method name
                 self.case_list.append(case_entry)
 
+    def set_python_path(self):
+        lib_path = os.getcwd() + "/testlib/:" + sys.path[0]
+        if os.environ.has_key('PYTHONPATH'):
+            os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ":" + lib_path 
+        else:
+            os.environ['PYTHONPATH'] = lib_path
+        
     def run_case(self):
         log_case = None
         sys_stdout = None
         sys_stderr = None
 
+        self.set_python_path()
         try:
-            lib_path = os.getcwd() + "/testlib/:" + sys.path[0]
-            if os.environ.has_key('PYTHONPATH'):
-                os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ":" + lib_path 
-            else:
-                os.environ['PYTHONPATH'] = lib_path
-
             gl_var.adb_mgr = adb_obj.adb_obj()
             gl_var.adb_mgr.restart_adb_server()
 
@@ -82,6 +93,14 @@ class plan_reader:
             exec_id = data_server.create_new_execution()
 
             for case_entry in self.case_list:
+                case_input_params = ""
+                if len(case_entry[2]) > 0:
+                    input_params = case_entry[2].split(",")
+                    for input_param_formular in input_params:
+                        param_items = input_param_formular.split("=")
+                        case_input_params += " --tc=" + param_items[0].strip()
+                        case_input_params += ":" + param_items[1].strip()
+
                 entry_items = case_entry[0].split(".")
                 case_cmdline = "testcase/"
 
@@ -90,6 +109,7 @@ class plan_reader:
                 case_cmdline += entry_items[-3] + ".py:"
                 case_cmdline += entry_items[-2] + "."
                 case_cmdline += entry_items[-1]
+                print case_cmdline
 
                 exec_loop = string.atoi(case_entry[1])
                 for i in range(0, exec_loop):
@@ -100,20 +120,23 @@ class plan_reader:
                             case_folder = "%s/%s_%d" % (log_full_folder, case_entry[0], i)
                         os.makedirs(case_folder)
 
-                        p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=None)
+                        if len(case_input_params) > 0:
+                            p = subprocess.Popen(["nosetests", "-s", case_input_params, case_cmdline], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=None)
+                        else:
+                            p = subprocess.Popen(["nosetests", "-s", case_cmdline], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=None)
                         r = p.wait()
 
                         data_server.insert_new_record(exec_id, case_entry[0], r)
                     except Exception as e:
                         print "Exception = ", e
                     finally:
-                        log_buffer = p.stdout.readlines()
-                        for log_line in log_buffer:
-                            log_case.write(log_line)
-                        log_buffer = p.stderr.readlines()
-                        for log_line in log_buffer:
-                            log_case.write(log_line)
-                        log_case.flush()
+                        # log_buffer = p.stdout.readlines()
+                        # for log_line in log_buffer:
+                        #    log_case.write(log_line)
+                        # log_buffer = p.stderr.readlines()
+                        # for log_line in log_buffer:
+                        #    log_case.write(log_line)
+                        #log_case.flush()
                         adb_cmd = "/system/bin/screencap -p | sed 's/\r$//' > " + case_folder + "/Case_FinalScreen.png"; 
                         gl_var.adb_mgr.run_adb_cmd(adb_cmd)
         finally:
